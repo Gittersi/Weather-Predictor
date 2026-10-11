@@ -1,0 +1,153 @@
+{
+  "metrics": {
+    "temp": {
+      "r2": 0.92,
+      "rmse": 2.546,
+      "mae": 2.035
+    },
+    "temp_max": {
+      "r2": 0.9089,
+      "rmse": 2.75,
+      "mae": 2.196
+    },
+    "temp_min": {
+      "r2": 0.9104,
+      "rmse": 2.716,
+      "mae": 2.171
+    },
+    "humidity": {
+      "r2": 0.2231,
+      "rmse": 10.854,
+      "mae": 9.102
+    },
+    "pressure": {
+      "r2": 0.3663,
+      "rmse": 4.256,
+      "mae": 3.391
+    },
+    "wind_speed": {
+      "r2": 0.172,
+      "rmse": 4.524,
+      "mae": 3.572
+    },
+    "precipitation": {
+      "r2": -0.019,
+      "rmse": 9.892,
+      "mae": 6.573
+    },
+    "condition": {
+      "accuracy": 0.4532,
+      "classes": [
+        "Cloudy",
+        "Fog",
+        "Partly Cloudy",
+        "Rain",
+        "Snow",
+        "Sunny",
+        "Thunderstorm"
+      ]
+    }
+  },
+  "feature_importances": {
+    "temp": {
+      "temp_lag_1": 0.65,
+      "temp_roll_mean_3": 0.2671,
+      "temp_roll_mean_7": 0.0149,
+      "doy_cos": 0.0054,
+      "pressure_lag_3": 0.0043,
+      "temp_lag_2": 0.004,
+      "pressure_delta_3": 0.004,
+      "temp_roll_std_7": 0.0037,
+      "humidity_lag_1": 0.0036,
+      "temp_lag_7": 0.0035
+    },
+    "temp_max": {
+      "temp_lag_1": 0.569,
+      "temp_roll_mean_3": 0.3394,
+      "temp_roll_mean_7": 0.0138,
+      "doy_cos": 0.0057,
+      "pressure_lag_3": 0.0048,
+      "pressure_delta_3": 0.0045,
+      "temp_lag_2": 0.0044,
+      "wind_speed_lag_2": 0.0044,
+      "temp_roll_std_7": 0.0043,
+      "pressure_delta_1": 0.0042
+    },
+    "temp_min": {
+      "temp_lag_1": 0.6748,
+      "temp_roll_mean_3": 0.2334,
+      "temp_roll_mean_7": 0.016,
+      "doy_cos": 0.0058,
+      "pressure_lag_3": 0.0048,
+      "pressure_delta_3": 0.0047,
+      "temp_roll_std_7": 0.0042,
+      "wind_speed_lag_2": 0.0042,
+      "temp_lag_2": 0.0041,
+      "humidity_lag_1": 0.0039
+    },
+    "humidity": {
+      "humidity_roll_mean_3": 0.2485,
+      "temp_roll_mean_7": 0.064,
+      "humidity_lag_1": 0.0424,
+      "humidity_lag_2": 0.0405,
+      "doy_cos": 0.0397,
+      "temp_lag_7": 0.0365,
+      "temp_roll_std_7": 0.0364,
+      "humidity_lag_3": 0.036,
+      "wind_speed_lag_1": 0.0352,
+      "wind_speed_lag_2": 0.0343
+    },
+    "pressure": {
+      "pressure_lag_1": 0.4321,
+      "temp_lag_1": 0.0548,
+      "pressure_roll_mean_3": 0.0525,
+      "temp_roll_std_7": 0.0323,
+      "wind_speed_lag_1": 0.029,
+      "humidity_lag_3": 0.0285,
+      "doy_cos": 0.0281,
+      "pressure_delta_3": 0.0268,
+      "pressure_lag_3": 0.0266,
+      "wind_speed_lag_2": 0.0265
+    },
+    "wind_speed": {
+      "wind_speed_lag_1": 0.1632,
+      "pressure_lag_1": 0.0963,
+      "wind_speed_lag_2": 0.0632,
+      "temp_roll_std_7": 0.0451,
+      "pressure_roll_mean_3": 0.0447,
+      "temp_lag_1": 0.0413,
+      "humidity_roll_mean_3": 0.0395,
+      "doy_sin": 0.0379,
+      "humidity_lag_2": 0.0378,
+      "pressure_delta_3": 0.0377
+    },
+    "precipitation": {
+      "temp_roll_std_7": 0.0608,
+      "wind_speed_lag_2": 0.0512,
+      "temp_lag_1": 0.0507,
+      "humidity_roll_mean_3": 0.0504,
+      "wind_speed_lag_1": 0.0503,
+      "doy_sin": 0.05,
+      "pressure_delta_3": 0.0481,
+      "doy_cos": 0.0475,
+      "pressure_lag_1": 0.0461,
+      "temp_roll_mean_7": 0.0458
+    },
+    "condition": {
+      "humidity_roll_mean_3": 0.0715,
+      "temp_lag_1": 0.05,
+      "humidity_lag_2": 0.0495,
+      "temp_roll_mean_7": 0.0493,
+      "humidity_lag_3": 0.049,
+      "humidity_lag_1": 0.0489,
+      "temp_roll_mean_3": 0.0479,
+      "doy_cos": 0.0463,
+      "pressure_lag_1": 0.042,
+      "temp_lag_2": 0.0419
+    }
+  },
+  "params": {
+    "n_estimators": 80,
+    "max_depth": 14
+  }
+}

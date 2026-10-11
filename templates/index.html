@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroForest AI – Random Forest Weather Forecasting Model</title>
+  <meta name="description" content="Advanced weather forecasting powered by Random Forest ensemble machine learning. Predicts temperature, precipitation, pressure, and weather patterns from historical climate data.">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Chart.js for high-fidelity interactive data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Ambient backdrop lights -->
+  <div class="ambient-glow ambient-glow--1"></div>
+  <div class="ambient-glow ambient-glow--2"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Executing Random Forest Ensemble Forecast...</div>
+  </div>
+
+  <div class="app-container">
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="hero__bg"></div>
+      <div class="hero__overlay"></div>
+      <div class="hero__content">
+        <div class="hero__badge">
+          <span class="pulse-dot"></span>
+          Machine Learning • Random Forest Regressor & Classifier
+        </div>
+        <h1 class="hero__title">AeroForest AI Weather Forecaster</h1>
+        <p class="hero__subtitle">
+          Harnessing multi-tree ensemble learning, autoregressive time-series lags, and barometric feature engineering to forecast future climate patterns.
+        </p>
+      </div>
+    </header>
+
+    <!-- Interactive Navigation & Control Bar -->
+    <section class="glass-card controls-bar" id="controlsBar">
+      <div class="control-group">
+        <label for="citySelect">Select Region / City</label>
+        <select id="citySelect">
+          <option value="New York" selected>New York, USA</option>
+          <option value="London">London, UK</option>
+          <option value="Tokyo">Tokyo, Japan</option>
+          <option value="Mumbai">Mumbai, India</option>
+          <option value="Sydney">Sydney, Australia</option>
+          <option value="San Francisco">San Francisco, USA</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="horizonSelect">Forecast Horizon</label>
+        <select id="horizonSelect">
+          <option value="3">3 Days Ahead</option>
+          <option value="7" selected>7 Days Ahead (Weekly)</option>
+          <option value="14">14 Days Ahead (Bi-weekly)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="historyRange">Historical Context</label>
+        <select id="historyRange">
+          <option value="14">Past 14 Days</option>
+          <option value="30" selected>Past 30 Days</option>
+          <option value="60">Past 60 Days</option>
+        </select>
+      </div>
+
+      <div class="controls-actions">
+        <button id="btnRunForecast" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Run Forecast
+        </button>
+        <button id="btnToggleScenario" class="btn btn-outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+          </svg>
+          What-If Simulator
+        </button>
+      </div>
+    </section>
+
+    <!-- What-If Scenario Simulator Panel (Collapsible) -->
+    <section class="glass-card scenario-panel hidden" id="scenarioPanel">
+      <div class="scenario-panel__header">
+        <div class="scenario-badge">Interactive Climate Perturbation</div>
+        <h3>Random Forest "What-If" Scenario Simulator</h3>
+        <p>Simulate sudden barometric shifts, heatwaves, or high humidity fronts to evaluate how the Random Forest ensemble responds to abnormal conditions.</p>
+      </div>
+      <div class="scenario-grid">
+        <div class="scenario-item">
+          <div class="scenario-label-wrap">
+            <label for="tempOffsetSlider">Temperature Perturbation</label>
+            <span class="scenario-val" id="tempOffsetVal">+0.0°C</span>
+          </div>
+          <input type="range" id="tempOffsetSlider" min="-10" max="10" step="0.5" value="0">
+          <div class="slider-marks"><span>-10°C (Polar Snap)</span><span>Baseline</span><span>+10°C (Heatwave)</span></div>
+        </div>
+
+        <div class="scenario-item">
+          <div class="scenario-label-wrap">
+            <label for="pressureOffsetSlider">Barometric Pressure Shift</label>
+            <span class="scenario-val" id="pressureOffsetVal">0.0 hPa</span>
+          </div>
+          <input type="range" id="pressureOffsetSlider" min="-25" max="25" step="1" value="0">
+          <div class="slider-marks"><span>-25 hPa (Deep Depression)</span><span>Baseline</span><span>+25 hPa (High Pressure)</span></div>
+        </div>
+
+        <div class="scenario-item">
+          <div class="scenario-label-wrap">
+            <label for="humidityOffsetSlider">Humidity Factor</label>
+            <span class="scenario-val" id="humidityOffsetVal">0%</span>
+          </div>
+          <input type="range" id="humidityOffsetSlider" min="-30" max="30" step="5" value="0">
+          <div class="slider-marks"><span>-30% (Arid)</span><span>Baseline</span><span>+30% (Saturated)</span></div>
+        </div>
+      </div>
+      <div class="scenario-actions">
+        <button id="btnApplyScenario" class="btn btn-accent">Simulate Scenario</button>
+        <button id="btnResetScenario" class="btn btn-ghost">Reset to Real Baseline</button>
+      </div>
+    </section>
+
+    <!-- Current Meteorological Conditions Snapshot -->
+    <section class="current-stats-section">
+      <div class="stats-row" id="statsRow">
+        <div class="glass-card stat-card">
+          <div class="stat-icon temp">🌡️</div>
+          <div class="stat-info">
+            <div class="stat-label">Current / Base Temp</div>
+            <div class="stat-value" id="currentTemp">--°C</div>
+            <div class="stat-change" id="tempRangeMinMax">Min: --°C • Max: --°C</div>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
+          <div class="stat-icon condition" id="conditionIcon">⛅</div>
+          <div class="stat-info">
+            <div class="stat-label">Weather Condition</div>
+            <div class="stat-value" id="currentCondition">--</div>
+            <div class="stat-change" id="conditionConsensus">Consensus: --%</div>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
+          <div class="stat-icon humidity">💧</div>
+          <div class="stat-info">
+            <div class="stat-label">Relative Humidity</div>
+            <div class="stat-value" id="currentHumidity">--%</div>
+            <div class="stat-change" id="humidityStatus">Normal range</div>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
+          <div class="stat-icon pressure">🧭</div>
+          <div class="stat-info">
+            <div class="stat-label">Barometric Pressure</div>
+            <div class="stat-value" id="currentPressure">-- hPa</div>
+            <div class="stat-change" id="pressureStatus">Steady</div>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
+          <div class="stat-icon wind">💨</div>
+          <div class="stat-info">
+            <div class="stat-label">Wind Velocity</div>
+            <div class="stat-value" id="currentWind">-- km/h</div>
+            <div class="stat-change" id="windStatus">Moderate breeze</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Forecast Cards Ribbon (Visual Cards for Upcoming Days) -->
+    <section class="forecast-section">
+      <div class="section-header">
+        <div>
+          <h2>Random Forest Predictive Horizon</h2>
+          <p class="section-desc">Iterative autoregressive projections with decision tree ensemble consensus</p>
+        </div>
+        <div class="ensemble-badge-info">
+          <span class="badge-dot"></span> Random Forest Ensemble: <strong id="rfTreesCount">80</strong> Decision Trees
+        </div>
+      </div>
+
+      <div class="forecast-cards-container" id="forecastCardsContainer">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+    </section>
+
+    <!-- Charts & Explainability Section -->
+    <section class="visuals-section">
+      <div class="glass-card chart-card full-width">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title" id="timelineChartTitle">Temperature Trajectory: Historical Records vs Random Forest Forecast</div>
+            <div class="chart-subtitle">Continuous time-series transition with Random Forest 90% confidence uncertainty envelope (±1.645 σ)</div>
+          </div>
+          <div class="chart-actions">
+            <button class="chart-tab active" data-metric="temp">Temperature</button>
+            <button class="chart-tab" data-metric="humidity">Humidity</button>
+            <button class="chart-tab" data-metric="pressure">Barometric Pressure</button>
+            <button class="chart-tab" data-metric="wind_speed">Wind Speed</button>
+          </div>
+        </div>
+        <div class="chart-container tall">
+          <canvas id="timelineChart"></canvas>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Chart: Random Forest Feature Importance (Explainable AI) -->
+        <div class="glass-card chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Random Forest Feature Importance (MDI)</div>
+              <div class="chart-subtitle">Mean Decrease in Impurity ranking key meteorological predictor variables</div>
+            </div>
+            <div class="chart-actions">
+              <select id="featTargetSelect" class="chart-select">
+                <option value="temp" selected>Target: Temperature</option>
+                <option value="humidity">Target: Humidity</option>
+                <option value="pressure">Target: Pressure</option>
+                <option value="wind_speed">Target: Wind Speed</option>
+                <option value="condition">Target: Weather Condition</option>
+              </select>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="featureImportanceChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart: Ensemble Variance & Tree Uncertainty Spread -->
+        <div class="glass-card chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Tree Ensemble Spread & Forecast Agreement</div>
+              <div class="chart-subtitle">Variance across decision trees as forecast horizon increases</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="uncertaintyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Machine Learning Architecture & Retraining Console -->
+    <section class="model-info">
+      <div class="glass-card model-card">
+        <h3>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          Model Performance & Validation Metrics
+        </h3>
+        <p class="card-caption">Trained on 5 years of daily meteorological observations with temporal 80/20 train-test validation.</p>
+
+        <div class="metrics-table-wrap">
+          <table class="metrics-table">
+            <thead>
+              <tr>
+                <th>Predictive Target</th>
+                <th>Model Type</th>
+                <th>R² Score</th>
+                <th>RMSE</th>
+                <th>MAE</th>
+              </tr>
+            </thead>
+            <tbody id="metricsTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="glass-card model-card">
+        <h3>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          Hyperparameter Tuner & Retraining Console
+        </h3>
+        <p class="card-caption">Re-train Random Forest with custom ensemble parameters and observe accuracy changes.</p>
+
+        <div class="tuning-form">
+          <div class="control-group">
+            <div class="scenario-label-wrap">
+              <label for="tuneEstimators">Number of Estimators (Trees)</label>
+              <span class="scenario-val" id="tuneEstimatorsVal">80 trees</span>
+            </div>
+            <input type="range" id="tuneEstimators" min="30" max="150" step="10" value="80">
+          </div>
+
+          <div class="control-group">
+            <div class="scenario-label-wrap">
+              <label for="tuneMaxDepth">Maximum Tree Depth</label>
+              <span class="scenario-val" id="tuneMaxDepthVal">14 levels</span>
+            </div>
+            <input type="range" id="tuneMaxDepth" min="6" max="22" step="2" value="14">
+          </div>
+
+          <button id="btnRetrainModel" class="btn btn-primary" style="margin-top: 10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            Retrain Random Forest
+          </button>
+          <div id="retrainStatus" class="retrain-status"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>AeroForest AI • High Precision Meteorological Forecasting using Random Forest Regression & Classification</p>
+      <p>Lag Autoregression • Barometric Gradient Tracking • Decision Tree Ensemble Variance</p>
+    </footer>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
